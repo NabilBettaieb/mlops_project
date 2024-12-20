@@ -1,0 +1,33 @@
+- name: Configuration ML
+  hosts: ml_servers
+  become: yes
+  tasks:
+
+    - name: Mise à jour du cache apt
+      apt:
+        update_cache: yes
+
+    - name: Installation de Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Démarrer le service Docker et l'activer 
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Ajouter l'utilisateur Ubuntu au groupe Docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Vérifier Docker
+      command: docker --version
+      register: docker_version
+
+    - name: Afficher la version de Docker 
+      debug:
+        msg: "Docker version installée : {{ docker_version.stdout }}"
